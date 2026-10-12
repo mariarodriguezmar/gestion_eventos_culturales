@@ -30,7 +30,8 @@ class Evento {
     print('Nombre: $nombre');
     print('Categoría: $categoria');
     print('Lugar: $lugar');
-    print('Fecha: $fecha');
+    print('Fecha: ${fecha.day}/${fecha.month}/${fecha.year}');
+    print('Hora: ${fecha.hour}:${fecha.minute.toString()}');  
     print('Capacidad: $capacidad personas');
   }
 }
@@ -38,6 +39,7 @@ class Evento {
 List<Evento> eventos = [];
 
 int siguienteCodigo = 1;
+
 
 void registrarEvento() {
   print('\n REGISTRAR EVENTO');
@@ -54,28 +56,76 @@ void registrarEvento() {
   stdout.write('Fecha (AAAA-MM-DD): ');
   String fechaTexto = stdin.readLineSync() ?? '';
 
+  stdout.write('Hora (HH:MM, formato 24 horas): ');
+  String horaTexto = stdin.readLineSync() ?? '';
+
   stdout.write('Capacidad: ');
   String capacidadTexto = stdin.readLineSync() ?? '';
 
-  DateTime? fecha;
-  try {
-    fecha = DateTime.parse(fechaTexto);
-  } catch (e) {
-    print('Error: la fecha no tiene un formato válido.');
-    return;
+  bool datosValidos = true;
+
+  if (nombre.trim().isEmpty) {
+    print('Error: el nombre es obligatorio.');
+    datosValidos = false;
   }
+
+  if (categoria.trim().isEmpty) {
+    print('Error: la categoría es obligatoria.');
+    datosValidos = false;
+  }
+
+  if (lugar.trim().isEmpty) {
+    print('Error: el lugar es obligatorio.');
+    datosValidos = false;
+  }
+
+ 
+DateTime? fecha;
+
+try {
+
+  DateTime fechaIngresada = DateTime.parse(fechaTexto);
+
+  List<String> partesHora = horaTexto.split(':');
+
+  if (partesHora.length != 2) {
+    throw FormatException('Formato de hora incorrecto');
+  }
+
+  int? hora = int.tryParse(partesHora[0]);
+  int? minuto = int.tryParse(partesHora[1]);
+
+  if (hora == null ||
+      minuto == null ||
+      hora < 0 ||
+      hora > 23 ||
+      minuto < 0 ||
+      minuto > 59) {
+    throw FormatException('Hora no válida');
+  }
+
+  fecha = DateTime(
+    fechaIngresada.year,
+    fechaIngresada.month,
+    fechaIngresada.day,
+    hora,
+    minuto,
+  );
+} catch (e) {
+  print('Error: revisa que la fecha y la hora sean válidas.');
+  datosValidos = false;
+}
+
 
   int? capacidad = int.tryParse(capacidadTexto);
 
-  if (nombre.trim().isEmpty ||
-      categoria.trim().isEmpty ||
-      lugar.trim().isEmpty) {
-    print('Error: nombre, categoría y lugar son obligatorios.');
-    return;
-  }
-
   if (capacidad == null || capacidad <= 0) {
     print('Error: la capacidad debe ser un entero mayor que cero.');
+    datosValidos = false;
+  }
+
+  if (!datosValidos) {
+    print('No se registró el evento. Corrige los datos e inténtalo de nuevo.');
     return;
   }
 
@@ -84,8 +134,8 @@ void registrarEvento() {
     nombre: nombre.trim(),
     categoria: categoria.trim(),
     lugar: lugar.trim(),
-    fecha: fecha,
-    capacidad: capacidad,
+    fecha: fecha!,
+    capacidad: capacidad!,
   );
 
   eventos.add(nuevoEvento);
@@ -93,4 +143,5 @@ void registrarEvento() {
 
   print('¡Evento registrado correctamente!');
   print('Código asignado: ${nuevoEvento.codigo}');
+  nuevoEvento.mostrarInformacion();
 }
