@@ -159,6 +159,7 @@ void listarEventos() {
   }
 }
 
+// Funcion busqueda de eventos por diferentes criterios.
 void buscarEvento() {
   print('\nBUSCAR EVENTO');
 
@@ -311,4 +312,135 @@ void buscarEvento() {
     default:
       print('Opción no válida. Elige una opción válida.');
   }
+}
+
+
+void modificarEvento() {
+  print('\nMODIFICAR EVENTO');
+
+  if (eventos.isEmpty) {
+    print('No hay eventos registrados para modificar.');
+    return;
+  }
+
+  stdout.write('Ingresa el código del evento que deseas modificar: ');
+  int? codigoBuscado = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (codigoBuscado == null) {
+    print('Error: debes ingresar un código numérico.');
+    return;
+  }
+
+  Evento? eventoEncontrado;
+
+  for (Evento eventoActual in eventos) {
+    if (eventoActual.codigo == codigoBuscado) {
+      eventoEncontrado = eventoActual;
+      break;
+    }
+  }
+
+  if (eventoEncontrado == null) {
+    print('No se encontró un evento con ese código.');
+    return;
+  }
+
+  print('\nDatos actuales del evento:');
+  eventoEncontrado.mostrarInformacion();
+
+  print('\nIngresa los nuevos datos del evento.');
+
+  stdout.write('Nuevo nombre: ');
+  String nombreNuevo = stdin.readLineSync() ?? '';
+
+  stdout.write('Nueva categoría: ');
+  String categoriaNueva = stdin.readLineSync() ?? '';
+
+  stdout.write('Nuevo lugar: ');
+  String lugarNuevo = stdin.readLineSync() ?? '';
+
+  stdout.write('Nueva fecha (AAAA-MM-DD): ');
+  String fechaTexto = stdin.readLineSync() ?? '';
+
+  stdout.write('Nueva hora (HH:MM): ');
+  String horaTexto = stdin.readLineSync() ?? '';
+
+  stdout.write('Nueva capacidad: ');
+  String capacidadTexto = stdin.readLineSync() ?? '';
+
+  bool datosValidos = true;
+
+  if (nombreNuevo.trim().isEmpty) {
+    print('Error: el nombre es obligatorio.');
+    datosValidos = false;
+  }
+
+  if (categoriaNueva.trim().isEmpty) {
+    print('Error: la categoría es obligatoria.');
+    datosValidos = false;
+  }
+
+  if (lugarNuevo.trim().isEmpty) {
+    print('Error: el lugar es obligatorio.');
+    datosValidos = false;
+  }
+
+  
+DateTime? fechaNueva;
+
+try {
+
+  DateTime fechaIngresada = DateTime.parse(fechaTexto);
+
+  List<String> partesHora = horaTexto.split(':');
+
+  if (partesHora.length != 2) {
+    throw FormatException('Formato de hora incorrecto');
+  }
+
+  int? hora = int.tryParse(partesHora[0]);
+  int? minuto = int.tryParse(partesHora[1]);
+
+  if (hora == null ||
+      minuto == null ||
+      hora < 0 ||
+      hora > 23 ||
+      minuto < 0 ||
+      minuto > 59) {
+    throw FormatException('Hora no válida');
+  }
+
+  fechaNueva = DateTime(
+    fechaIngresada.year,
+    fechaIngresada.month,
+    fechaIngresada.day,
+    hora,
+    minuto,
+  );
+} catch (e) {
+  print('Error: revisa que la fecha y la hora sean válidas.');
+  datosValidos = false;
+}
+
+
+  int? capacidadNueva = int.tryParse(capacidadTexto);
+
+  if (capacidadNueva == null || capacidadNueva <= 0) {
+    print('Error: la capacidad debe ser un entero mayor que cero.');
+    datosValidos = false;
+  }
+
+  if (!datosValidos) {
+    print('No se modificó el evento. Revisa los datos e inténtalo de nuevo.');
+    return;
+  }
+
+  eventoEncontrado.nombre = nombreNuevo.trim();
+  eventoEncontrado.categoria = categoriaNueva.trim();
+  eventoEncontrado.lugar = lugarNuevo.trim();
+  eventoEncontrado.fecha = fechaNueva!;
+  eventoEncontrado.capacidad = capacidadNueva!;
+
+  print('\n¡Evento modificado correctamente!');
+  eventoEncontrado.mostrarInformacion();
 }
