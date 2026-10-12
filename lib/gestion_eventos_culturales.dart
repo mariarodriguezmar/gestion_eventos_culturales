@@ -158,3 +158,157 @@ void listarEventos() {
     eventoActual.mostrarInformacion();
   }
 }
+
+void buscarEvento() {
+  print('\nBUSCAR EVENTO');
+
+  if (eventos.isEmpty) {
+    print('Aún no hay eventos registrados.');
+    return;
+  }
+
+  print('1. Filtrar por código');
+  print('2. Filtrar por nombre');
+  print('3. Filtrar por fecha');
+  print('4. Filtrar por categoría');
+  print('5. Filtrar por lugar');
+
+  stdout.write('Elige el tipo de búsqueda: ');
+  String opcion = stdin.readLineSync() ?? '';
+
+  switch (opcion) {
+    case '1':
+      stdout.write('Ingresa el código del evento: ');
+      int? codigoBuscado =
+          int.tryParse(stdin.readLineSync() ?? '');
+
+      if (codigoBuscado == null) {
+        print('Error: ingresa un código numérico.');
+        break;
+      }
+
+      bool encontradoPorCodigo = false;
+
+      for (Evento eventoActual in eventos) {
+        if (eventoActual.codigo == codigoBuscado) {
+          eventoActual.mostrarInformacion();
+          encontradoPorCodigo = true;
+          break;
+        }
+      }
+
+      if (!encontradoPorCodigo) {
+        print('No se encontró un evento con ese código.');
+      }
+      break;
+
+    case '2':
+      stdout.write('Ingresa el nombre del evento: ');
+      String nombreBuscado =
+          (stdin.readLineSync() ?? '').trim().toLowerCase();
+
+      if (nombreBuscado.isEmpty) {
+        print('Error: debes ingresar un nombre.');
+        break;
+      }
+
+      bool encontradoPorNombre = false;
+
+      for (Evento eventoActual in eventos) {
+        if (eventoActual.nombre
+            .toLowerCase()
+            .contains(nombreBuscado)) {
+          eventoActual.mostrarInformacion();
+          encontradoPorNombre = true;
+        }
+      }
+
+      if (!encontradoPorNombre) {
+        print('No se encontraron eventos con ese nombre.');
+      }
+      break;
+
+    case '3':
+      stdout.write('Ingresa la fecha (AAAA-MM-DD): ');
+      String fechaTexto = stdin.readLineSync() ?? '';
+      DateTime? fechaBuscada = DateTime.tryParse(fechaTexto);
+
+      if (fechaBuscada == null ||
+          !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(fechaTexto)) {
+        print('Error: ingresa una fecha válida en formato AAAA-MM-DD.');
+        break;
+      }
+
+      bool encontradoPorFecha = false;
+
+      for (Evento eventoActual in eventos) {
+        if (eventoActual.fecha.year == fechaBuscada.year &&
+            eventoActual.fecha.month == fechaBuscada.month &&
+            eventoActual.fecha.day == fechaBuscada.day) {
+          eventoActual.mostrarInformacion();
+          encontradoPorFecha = true;
+        }
+      }
+
+      if (!encontradoPorFecha) {
+        print('No se encontraron eventos para esa fecha.');
+      }
+      break;
+
+
+    case '4':
+      stdout.write('Ingresa la categoría: ');
+      String categoriaBuscada =
+          (stdin.readLineSync() ?? '').trim().toLowerCase();
+
+      if (categoriaBuscada.isEmpty) {
+        print('Error: debes ingresar una categoría.');
+        break;
+      }
+
+      bool encontradoPorCategoria = false;
+
+      for (Evento eventoActual in eventos) {
+        if (eventoActual.categoria
+            .toLowerCase()
+            .contains(categoriaBuscada)) {
+          eventoActual.mostrarInformacion();
+          encontradoPorCategoria = true;
+        }
+      }
+
+      if (!encontradoPorCategoria) {
+        print('No se encontraron eventos de esa categoría.');
+      }
+      break;
+
+    case '5':
+      stdout.write('Ingresa el lugar: ');
+      String lugarBuscado =
+          (stdin.readLineSync() ?? '').trim().toLowerCase();
+
+      if (lugarBuscado.isEmpty) {
+        print('Error: debe ingresar un lugar.');
+        break;
+      }
+
+      bool encontradoPorLugar = false;
+
+      for (Evento eventoActual in eventos) {
+        if (eventoActual.lugar
+            .toLowerCase()
+            .contains(lugarBuscado)) {
+          eventoActual.mostrarInformacion();
+          encontradoPorLugar = true;
+        }
+      }
+
+      if (!encontradoPorLugar) {
+        print('No se encontraron eventos en ese lugar.');
+      }
+      break;
+
+    default:
+      print('Opción no válida. Elige una opción válida.');
+  }
+}
