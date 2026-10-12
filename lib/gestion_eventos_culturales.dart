@@ -455,17 +455,18 @@ void modificarEvento() {
         }
         break;
 
+      
       case '2':
-        stdout.write('Nueva categoría: ');
-        String entrada = stdin.readLineSync() ?? '';
+        String? categoriaSeleccionada = seleccionarCategoria();
 
-        if (entrada.trim().isEmpty) {
-          print('Error: la categoría es obligatoria.');
+        if (categoriaSeleccionada == null) {
+          print('No se pudo modificar la categoría.');
           datosValidos = false;
         } else {
-          categoriaNueva = entrada.trim();
+          categoriaNueva = categoriaSeleccionada;
         }
         break;
+
 
       case '3':
         stdout.write('Nuevo lugar: ');
