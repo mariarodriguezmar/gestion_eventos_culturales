@@ -40,6 +40,53 @@ List<Evento> eventos = [];
 
 int siguienteCodigo = 1;
 
+List<String> categoriasDisponibles = [
+  'Música',
+  'Teatro',
+  'Danza',
+  'Cine',
+  'Literatura',
+  'Exposiciones',
+  'Otros',
+];
+
+String? seleccionarCategoria() {
+  print('\nCATEGORÍAS DISPONIBLES');
+
+  for (int i = 0; i < categoriasDisponibles.length; i++) {
+    print('${i + 1}. ${categoriasDisponibles[i]}');
+  }
+
+  stdout.write('Selecciona una categoría: ');
+  String opcion = (stdin.readLineSync() ?? '').trim();
+
+  int? numero = int.tryParse(opcion);
+
+  if (numero == null ||
+      numero < 1 || numero > categoriasDisponibles.length) {
+    print('Error: selecciona un número de la lista.');
+    return null;
+  }
+
+  String categoriaSeleccionada = categoriasDisponibles[numero - 1];
+
+  if (categoriaSeleccionada == 'Otros') {
+    stdout.write('Escribe el nombre de la categoría: ');
+    String categoriaPersonalizada =
+        (stdin.readLineSync() ?? '').trim();
+
+    if (categoriaPersonalizada.isEmpty) {
+      print('Error: la categoría no puede estar vacía.');
+      return null;
+    }
+
+    return categoriaPersonalizada;
+  }
+
+  return categoriaSeleccionada;
+}
+
+
 
 void registrarEvento() {
   print('\n REGISTRAR EVENTO');
@@ -47,8 +94,15 @@ void registrarEvento() {
   stdout.write('Nombre del evento: ');
   String nombre = stdin.readLineSync() ?? '';
 
-  stdout.write('Categoría: ');
-  String categoria = stdin.readLineSync() ?? '';
+  
+  String? categoriaSeleccionada = seleccionarCategoria();
+
+  if (categoriaSeleccionada == null) {
+    print('No se pudo registrar el evento. Inténtalo nuevamente.');
+    return;
+  }
+  String categoria = categoriaSeleccionada;
+
 
   stdout.write('Lugar: ');
   String lugar = stdin.readLineSync() ?? '';
