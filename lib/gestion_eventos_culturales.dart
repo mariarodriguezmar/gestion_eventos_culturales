@@ -572,3 +572,43 @@ void eliminarEvento() {
     print('Respuesta no válida. El evento se conserva.');
   }
 }
+
+void mostrarReporte() {
+  print('\nREPORTE DE EVENTOS');
+
+  if (eventos.isEmpty) {
+    print('No hay eventos registrados para generar el reporte.');
+    return;
+  }
+
+  int totalEventos = eventos.length;
+  int capacidadTotal = 0;
+
+  Map<String, int> eventosPorCategoria = {};
+
+  Evento eventoMayorCapacidad = eventos.first;
+
+  for (Evento eventoActual in eventos) {
+    capacidadTotal += eventoActual.capacidad;
+
+    String categoria = eventoActual.categoria;
+    eventosPorCategoria[categoria] =
+        (eventosPorCategoria[categoria] ?? 0) + 1;
+
+    if (eventoActual.capacidad > eventoMayorCapacidad.capacidad) {
+      eventoMayorCapacidad = eventoActual;
+    }
+  }
+
+  print('Total de eventos registrados: $totalEventos');
+
+  print('\nCantidad de eventos por categoría:');
+  eventosPorCategoria.forEach((categoria, cantidad) {
+    print('$categoria: $cantidad');
+  });
+
+  print('\nCapacidad total: $capacidadTotal personas');
+
+  print('\nEvento con mayor capacidad:');
+  eventoMayorCapacidad.mostrarInformacion();
+}
