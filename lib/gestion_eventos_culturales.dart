@@ -506,6 +506,15 @@ void modificarEvento() {
     return;
   }
 
+  stdout.write('\n¿Confirmas los cambios realizados? (s/n): ');
+  String confirmacion =
+      (stdin.readLineSync() ?? '').trim().toLowerCase();
+
+  if (confirmacion != 's') {
+    print('Modificación cancelada. El evento conserva sus datos originales.');
+    return;
+  }
+
   eventoEncontrado.nombre = nombreNuevo;
   eventoEncontrado.categoria = categoriaNueva;
   eventoEncontrado.lugar = lugarNuevo;
