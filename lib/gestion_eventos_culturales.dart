@@ -515,3 +515,51 @@ void modificarEvento() {
   print('\n¡Evento modificado correctamente!');
   eventoEncontrado.mostrarInformacion();
 }
+
+
+void eliminarEvento() {
+  print('\nELIMINAR EVENTO');
+
+  if (eventos.isEmpty) {
+    print('No hay eventos registrados para eliminar.');
+    return;
+  }
+
+  stdout.write('Ingresa el código del evento que deseas eliminar: ');
+  int? codigoBuscado = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (codigoBuscado == null) {
+    print('Error: debes ingresar un código numérico.');
+    return;
+  }
+
+  Evento? eventoEncontrado;
+
+  for (Evento eventoActual in eventos) {
+    if (eventoActual.codigo == codigoBuscado) {
+      eventoEncontrado = eventoActual;
+      break;
+    }
+  }
+
+  if (eventoEncontrado == null) {
+    print('No se encontró un evento con ese código.');
+    return;
+  }
+
+  print('\nEvento que deseas eliminar:');
+  eventoEncontrado.mostrarInformacion();
+
+  stdout.write('\n¿Estás seguro de eliminar este evento? (s/n): ');
+  String confirmacion =
+      (stdin.readLineSync() ?? '').trim().toLowerCase();
+
+  if (confirmacion == 's') {
+    eventos.remove(eventoEncontrado);
+    print('¡Evento eliminado correctamente!');
+  } else if (confirmacion == 'n') {
+    print('Operación cancelada. El evento se conserva.');
+  } else {
+    print('Respuesta no válida. El evento se conserva.');
+  }
+}
