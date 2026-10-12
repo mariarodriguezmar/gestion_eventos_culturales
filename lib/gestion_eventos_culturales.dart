@@ -145,3 +145,16 @@ try {
   print('Código asignado: ${nuevoEvento.codigo}');
   nuevoEvento.mostrarInformacion();
 }
+
+void listarEventos() {
+  print('\nLISTA DE EVENTOS');
+
+  if (eventos.isEmpty) {
+    print('No hay eventos registrados.');
+    return;
+  }
+
+  for (Evento eventoActual in eventos) {
+    eventoActual.mostrarInformacion();
+  }
+}
