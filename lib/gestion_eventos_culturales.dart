@@ -348,86 +348,157 @@ void modificarEvento() {
   print('\nDatos actuales del evento:');
   eventoEncontrado.mostrarInformacion();
 
-  print('\nIngresa los nuevos datos del evento.');
+  print('\n¿Qué campos deseas modificar?');
+  print('Escribe los números separados por comas.');
+  print('1. Nombre');
+  print('2. Categoría');
+  print('3. Lugar');
+  print('4. Fecha');
+  print('5. Hora');
+  print('6. Capacidad');
 
-  stdout.write('Nuevo nombre: ');
-  String nombreNuevo = stdin.readLineSync() ?? '';
+  stdout.write('Selecciona los campos: ');
+  String seleccion = stdin.readLineSync() ?? '';
 
-  stdout.write('Nueva categoría: ');
-  String categoriaNueva = stdin.readLineSync() ?? '';
+  List<String> camposSeleccionados = seleccion
+      .split(',')
+      .map((campo) => campo.trim())
+      .toList();
 
-  stdout.write('Nuevo lugar: ');
-  String lugarNuevo = stdin.readLineSync() ?? '';
+  Set<String> opcionesValidas = {'1', '2', '3', '4', '5', '6'};
 
-  stdout.write('Nueva fecha (AAAA-MM-DD): ');
-  String fechaTexto = stdin.readLineSync() ?? '';
+  bool seleccionValida =
+      camposSeleccionados.isNotEmpty &&
+      camposSeleccionados.every(
+        (campo) => opcionesValidas.contains(campo),
+      ) &&
+      camposSeleccionados.toSet().length == camposSeleccionados.length;
 
-  stdout.write('Nueva hora (HH:MM): ');
-  String horaTexto = stdin.readLineSync() ?? '';
+  if (!seleccionValida) {
+    print('Selección inválida. Revisa los números e inténtalo de nuevo.');
+    return;
+  }
 
-  stdout.write('Nueva capacidad: ');
-  String capacidadTexto = stdin.readLineSync() ?? '';
+  String nombreNuevo = eventoEncontrado.nombre;
+  String categoriaNueva = eventoEncontrado.categoria;
+  String lugarNuevo = eventoEncontrado.lugar;
+  DateTime fechaNueva = eventoEncontrado.fecha;
+  int capacidadNueva = eventoEncontrado.capacidad;
 
   bool datosValidos = true;
 
-  if (nombreNuevo.trim().isEmpty) {
-    print('Error: el nombre es obligatorio.');
-    datosValidos = false;
-  }
+  for (String campo in camposSeleccionados) {
+    switch (campo) {
+      case '1':
+        stdout.write('Nuevo nombre: ');
+        String entrada = stdin.readLineSync() ?? '';
 
-  if (categoriaNueva.trim().isEmpty) {
-    print('Error: la categoría es obligatoria.');
-    datosValidos = false;
-  }
+        if (entrada.trim().isEmpty) {
+          print('Error: el nombre es obligatorio.');
+          datosValidos = false;
+        } else {
+          nombreNuevo = entrada.trim();
+        }
+        break;
 
-  if (lugarNuevo.trim().isEmpty) {
-    print('Error: el lugar es obligatorio.');
-    datosValidos = false;
-  }
+      case '2':
+        stdout.write('Nueva categoría: ');
+        String entrada = stdin.readLineSync() ?? '';
 
-  
-DateTime? fechaNueva;
+        if (entrada.trim().isEmpty) {
+          print('Error: la categoría es obligatoria.');
+          datosValidos = false;
+        } else {
+          categoriaNueva = entrada.trim();
+        }
+        break;
 
-try {
+      case '3':
+        stdout.write('Nuevo lugar: ');
+        String entrada = stdin.readLineSync() ?? '';
 
-  DateTime fechaIngresada = DateTime.parse(fechaTexto);
+        if (entrada.trim().isEmpty) {
+          print('Error: el lugar es obligatorio.');
+          datosValidos = false;
+        } else {
+          lugarNuevo = entrada.trim();
+        }
+        break;
 
-  List<String> partesHora = horaTexto.split(':');
+      case '4':
+        stdout.write('Nueva fecha (AAAA-MM-DD): ');
+        String fechaTexto = stdin.readLineSync() ?? '';
 
-  if (partesHora.length != 2) {
-    throw FormatException('Formato de hora incorrecto');
-  }
+        DateTime? fechaIngresada = DateTime.tryParse(fechaTexto);
 
-  int? hora = int.tryParse(partesHora[0]);
-  int? minuto = int.tryParse(partesHora[1]);
+        if (fechaIngresada == null ||
+            !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(fechaTexto) ||
+            fechaIngresada.year.toString().padLeft(4, '0') !=
+                fechaTexto.substring(0, 4) ||
+            fechaIngresada.month != int.parse(fechaTexto.substring(5, 7)) ||
+            fechaIngresada.day != int.parse(fechaTexto.substring(8, 10))) {
+          print('Error: la fecha no es válida.');
+          datosValidos = false;
+        } else {
+          fechaNueva = DateTime(
+            fechaIngresada.year,
+            fechaIngresada.month,
+            fechaIngresada.day,
+            fechaNueva.hour,
+            fechaNueva.minute,
+          );
+        }
+        break;
 
-  if (hora == null ||
-      minuto == null ||
-      hora < 0 ||
-      hora > 23 ||
-      minuto < 0 ||
-      minuto > 59) {
-    throw FormatException('Hora no válida');
-  }
+      case '5':
+        stdout.write('Nueva hora (HH:MM): ');
+        String horaTexto = stdin.readLineSync() ?? '';
 
-  fechaNueva = DateTime(
-    fechaIngresada.year,
-    fechaIngresada.month,
-    fechaIngresada.day,
-    hora,
-    minuto,
-  );
-} catch (e) {
-  print('Error: revisa que la fecha y la hora sean válidas.');
-  datosValidos = false;
-}
+        List<String> partesHora = horaTexto.split(':');
 
+        if (partesHora.length != 2) {
+          print('Error: usa el formato HH:MM.');
+          datosValidos = false;
+          break;
+        }
 
-  int? capacidadNueva = int.tryParse(capacidadTexto);
+        int? hora = int.tryParse(partesHora[0]);
+        int? minuto = int.tryParse(partesHora[1]);
 
-  if (capacidadNueva == null || capacidadNueva <= 0) {
-    print('Error: la capacidad debe ser un entero mayor que cero.');
-    datosValidos = false;
+        if (hora == null ||
+            minuto == null ||
+            hora < 0 ||
+            hora > 23 ||
+            minuto < 0 ||
+            minuto > 59 ||
+            partesHora[0].length != 2 ||
+            partesHora[1].length != 2) {
+          print('Error: ingresa una hora válida, por ejemplo 09:30.');
+          datosValidos = false;
+        } else {
+          fechaNueva = DateTime(
+            fechaNueva.year,
+            fechaNueva.month,
+            fechaNueva.day,
+            hora,
+            minuto,
+          );
+        }
+        break;
+
+      case '6':
+        stdout.write('Nueva capacidad: ');
+        String entrada = stdin.readLineSync() ?? '';
+        int? capacidadIngresada = int.tryParse(entrada);
+
+        if (capacidadIngresada == null || capacidadIngresada <= 0) {
+          print('Error: la capacidad debe ser un entero mayor que cero.');
+          datosValidos = false;
+        } else {
+          capacidadNueva = capacidadIngresada;
+        }
+        break;
+    }
   }
 
   if (!datosValidos) {
@@ -435,11 +506,11 @@ try {
     return;
   }
 
-  eventoEncontrado.nombre = nombreNuevo.trim();
-  eventoEncontrado.categoria = categoriaNueva.trim();
-  eventoEncontrado.lugar = lugarNuevo.trim();
-  eventoEncontrado.fecha = fechaNueva!;
-  eventoEncontrado.capacidad = capacidadNueva!;
+  eventoEncontrado.nombre = nombreNuevo;
+  eventoEncontrado.categoria = categoriaNueva;
+  eventoEncontrado.lugar = lugarNuevo;
+  eventoEncontrado.fecha = fechaNueva;
+  eventoEncontrado.capacidad = capacidadNueva;
 
   print('\n¡Evento modificado correctamente!');
   eventoEncontrado.mostrarInformacion();
