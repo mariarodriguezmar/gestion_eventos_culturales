@@ -1,0 +1,10 @@
+[
+  {
+    "codigo": 1,
+    "nombre": "Festival",
+    "categoria": "Música",
+    "lugar": "Pereira",
+    "fecha": "2026-11-10T21:30:00.000",
+    "capacidad": 200
+  }
+]

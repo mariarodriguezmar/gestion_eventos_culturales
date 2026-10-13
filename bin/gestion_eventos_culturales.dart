@@ -15,6 +15,7 @@ bool preguntarSiContinuar(String mensaje) {
 }
 
 void main(List<String> arguments) {
+  gestion_eventos_culturales.cargarEventos();
   gestion_eventos_culturales.mostrarBienvenida();
 
   String opcion = '';

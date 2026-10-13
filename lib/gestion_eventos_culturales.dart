@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 void mostrarBienvenida() {
   print('SISTEMA DE GESTIÓN DE EVENTOS CULTURALES');
@@ -23,6 +24,28 @@ class Evento {
     required this.fecha,
     required this.capacidad,
   });
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'codigo': codigo,
+      'nombre': nombre,
+      'categoria': categoria,
+      'lugar': lugar,
+      'fecha': fecha.toIso8601String(),
+      'capacidad': capacidad,
+    };
+  }
+
+  factory Evento.fromJson(Map<String, dynamic> json) {
+    return Evento(
+      codigo: json['codigo'] as int,
+      nombre: json['nombre'] as String,
+      categoria: json['categoria'] as String,
+      lugar: json['lugar'] as String,
+      fecha: DateTime.parse(json['fecha'] as String),
+      capacidad: json['capacidad'] as int,
+    );
+  }
 
   // Metodo: muestra la info del evento.
   void mostrarInformacion() {
@@ -39,6 +62,51 @@ class Evento {
 List<Evento> eventos = [];
 
 int siguienteCodigo = 1;
+
+
+String obtenerRutaArchivo() {
+  return 'eventos.json';
+}
+
+void guardarEventos() {
+  File archivo = File(obtenerRutaArchivo());
+
+  List<Map<String, dynamic>> datos =
+      eventos.map((evento) => evento.toJson()).toList();
+
+  archivo.writeAsStringSync(
+    const JsonEncoder.withIndent('  ').convert(datos),
+  );
+}
+
+void cargarEventos() {
+  File archivo = File(obtenerRutaArchivo());
+
+  if (!archivo.existsSync()) {
+    eventos = [];
+    siguienteCodigo = 1;
+    return;
+  }
+
+  String contenido = archivo.readAsStringSync();
+
+  List<dynamic> datos = jsonDecode(contenido);
+
+  eventos = datos.map((dato) {
+    return Evento.fromJson(Map<String, dynamic>.from(dato));
+  }).toList();
+
+  if (eventos.isEmpty) {
+    siguienteCodigo = 1;
+  } else {
+    siguienteCodigo =
+        eventos.map((evento) => evento.codigo).reduce(
+              (mayor, codigo) => codigo > mayor ? codigo : mayor,
+            ) +
+            1;
+  }
+}
+
 
 List<String> categoriasDisponibles = [
   'Música',
@@ -193,6 +261,7 @@ try {
   );
 
   eventos.add(nuevoEvento);
+  guardarEventos();
   siguienteCodigo++;
 
   print('¡Evento registrado correctamente!');
@@ -575,6 +644,7 @@ void modificarEvento() {
   eventoEncontrado.lugar = lugarNuevo;
   eventoEncontrado.fecha = fechaNueva;
   eventoEncontrado.capacidad = capacidadNueva;
+  guardarEventos();
 
   print('\n¡Evento modificado correctamente!');
   eventoEncontrado.mostrarInformacion();
@@ -620,6 +690,7 @@ void eliminarEvento() {
 
   if (confirmacion == 's') {
     eventos.remove(eventoEncontrado);
+    guardarEventos();
     print('¡Evento eliminado correctamente!');
   } else if (confirmacion == 'n') {
     print('Operación cancelada. El evento se conserva.');
